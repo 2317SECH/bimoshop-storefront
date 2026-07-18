@@ -42,10 +42,18 @@ export function Navbar() {
         style={{ opacity: scrollProgress }}
       />
 
-      <div className="relative mx-auto flex h-[72px] max-w-6xl items-center justify-between px-6">
+      <div className="relative mx-auto flex h-[72px] max-w-6xl items-center gap-4 px-6">
+        <a
+          href="https://bimo-hub.vercel.app/"
+          aria-label="Volver a BIMO"
+          className="flex items-center gap-1 text-body-sm text-neutral-500 transition-colors hover:text-neutral-900"
+        >
+          <span aria-hidden="true">←</span> BIMO
+        </a>
         <Link href="/" className="text-h4 font-semibold text-neutral-900">
           BIMO Shop
         </Link>
+        <div className="flex-1" />
 
         <nav aria-label="Navegación principal" className="hidden items-center gap-8 md:flex">
           {NAV_LINKS.map((item) => (
