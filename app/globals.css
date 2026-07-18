@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  /* Neutros -- Design System §1.1 */
+  --color-neutral-0: #fafaf8;
+  --color-neutral-50: #f5f4f0;
+  --color-neutral-100: #f0efeb;
+  --color-neutral-200: #e3e1db;
+  --color-neutral-400: #9c978d;
+  --color-neutral-700: #3c3a35;
+  --color-neutral-900: #161513;
+
+  /* Acento -- Design System §1.2. amber-600 = acentos/texto/links sobre fondo
+     claro. amber-700 = fondos solidos con texto blanco (unico que cumple
+     AA 4.5:1 como fondo de boton). No intercambiar. */
+  --color-amber-50: #fbeee4;
+  --color-amber-100: #f3d8be;
+  --color-amber-400: #d08a55;
+  --color-amber-600: #c4703b;
+  --color-amber-700: #a85a2a;
+
+  /* Semantica de estado -- Design System §1.3. Excepcion documentada al
+     "un solo acento": solo para error/exito/stock, nunca UI de marca. */
+  --color-success-600: #3f7a52;
+  --color-error-600: #b3432e;
+
+  /* Escala tipografica -- Design System §2.1 */
+  --text-display: 3.5rem;
+  --text-display--line-height: 4rem;
+  --text-h1: 2.5rem;
+  --text-h1--line-height: 3rem;
+  --text-h2: 2rem;
+  --text-h2--line-height: 2.5rem;
+  --text-h3: 1.5rem;
+  --text-h3--line-height: 2rem;
+  --text-h4: 1.25rem;
+  --text-h4--line-height: 1.75rem;
+  --text-body-lg: 1.125rem;
+  --text-body-lg--line-height: 1.75rem;
+  --text-body: 1rem;
+  --text-body--line-height: 1.625rem;
+  --text-small: 0.875rem;
+  --text-small--line-height: 1.375rem;
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1rem;
+}
+
+/* Nota: espaciado (space-*), radios (8px/12px) y breakpoints del Design
+   System ya coinciden con los valores por defecto de Tailwind v4 -- no
+   requieren override (ver Design System §3, §4, §11). */
+
+body {
+  background-color: var(--color-neutral-0);
+  color: var(--color-neutral-900);
+  font-family: var(--font-sans);
+}
+
+/* Foco visible siempre -- Design System §9, no negociable. */
+:focus-visible {
+  outline: 2px solid var(--color-amber-600);
+  outline-offset: 2px;
+}
+
+/* Carrusel horizontal (Colección, mobile/tablet) -- oculta el scrollbar sin
+   quitar el scroll nativo ni el snap. */
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
