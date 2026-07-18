@@ -3,14 +3,15 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { Menu, X, ShoppingBag } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { NAV_LINKS } from "@/lib/site-nav";
 
 /** Navbar sitewide (vive en app/layout.tsx, Fase 8.1). Transparente sobre
  * el Hero, se solidifica con blur en los primeros 100px de scroll (Design
  * System §5.5) -- por eso mide el progreso de scroll en vez de un simple
- * boolean. Carrito sin contador todavía: no hay estado de carrito real
- * hasta Fase 8.6, mostrar un numero ahi seria un dato inventado. */
+ * boolean. Sin ícono de carrito a propósito (Fase 5): la compra es directa
+ * (botón "Comprar ahora" -> cartCreate -> checkout), no hay página de
+ * carrito ni estado de carrito persistente que mostrar acá. */
 export function Navbar() {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -59,10 +60,6 @@ export function Navbar() {
         </nav>
 
         <div className="flex items-center gap-4">
-          <Link href="/carrito" aria-label="Carrito" className="text-neutral-900 transition-opacity hover:opacity-70">
-            <ShoppingBag className="h-5 w-5" strokeWidth={1.5} />
-          </Link>
-
           <button
             type="button"
             aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
