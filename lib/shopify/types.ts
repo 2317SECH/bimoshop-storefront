@@ -55,7 +55,7 @@ export type ShopifyProductDetailNode = {
   priceRange: { minVariantPrice: ShopifyMoney };
   images: { nodes: ShopifyProductImage[] };
   variants: { nodes: { id: string; availableForSale: boolean }[] };
-  collections: { nodes: { handle: string }[] };
+  collections: { nodes: { handle: string; title: string }[] };
 };
 
 export type ProductByHandleResponse = {
@@ -74,10 +74,12 @@ export type ProductDetail = {
   images: ShopifyProductImage[];
   variantId: string | null;
   availableForSale: boolean;
-  /** Handle de una colección real del producto (para "productos
-   * relacionados") -- preferí una categoría específica sobre la colección
-   * maestra "el-sistema-bimo" cuando el producto tiene ambas. */
+  /** Handle/título de una colección real del producto (para "productos
+   * relacionados" y el breadcrumb) -- preferí una categoría específica
+   * sobre la colección maestra "el-sistema-bimo" cuando el producto tiene
+   * ambas. */
   collectionHandle: string | null;
+  collectionTitle: string | null;
 };
 
 export type CartCreateResponse = {

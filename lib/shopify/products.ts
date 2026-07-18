@@ -74,10 +74,10 @@ export async function getProductByHandle(handle: string): Promise<ProductDetail 
 
   const variant = node.variants.nodes[0];
   // preferir una categoría especifica (no la maestra) para "relacionados"
-  // -- da productos más parecidos entre sí que "cualquiera de los 49".
-  const collectionHandles = node.collections.nodes.map((c) => c.handle);
-  const collectionHandle =
-    collectionHandles.find((h) => !HIDDEN_COLLECTION_HANDLES.has(h)) ?? collectionHandles[0] ?? null;
+  // y el breadcrumb -- da productos más parecidos entre sí que "cualquiera
+  // de los 49" y un breadcrumb más útil que "El Sistema BIMO" siempre.
+  const preferredCollection =
+    node.collections.nodes.find((c) => !HIDDEN_COLLECTION_HANDLES.has(c.handle)) ?? node.collections.nodes[0] ?? null;
 
   return {
     id: node.id,
@@ -88,7 +88,8 @@ export async function getProductByHandle(handle: string): Promise<ProductDetail 
     images: node.images.nodes,
     variantId: variant?.id ?? null,
     availableForSale: variant?.availableForSale ?? false,
-    collectionHandle,
+    collectionHandle: preferredCollection?.handle ?? null,
+    collectionTitle: preferredCollection?.title ?? null,
   };
 }
 

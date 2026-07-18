@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ProductTile } from "@/components/product/ProductTile";
 import { ProductMessage } from "@/components/product/ProductMessage";
+import { Reveal } from "@/components/motion/Reveal";
 import { getCatalog, getCollections, getProductsByCollection } from "@/lib/shopify/products";
 import type { LaunchProduct, StoreCollection } from "@/lib/shopify/types";
 
@@ -10,10 +11,14 @@ export const metadata: Metadata = {
   description: "El catálogo completo de BIMO Shop.",
 };
 
-/** Fase 5 Paso 2 -- catálogo completo, con filtro por categoría real de
- * Shopify (chips por query param, sin JS de cliente: cada chip es un link
- * `?categoria=handle`, el filtrado corre server-side). Reemplaza la Fase
- * 8.4 (5 productos fijos, sin filtro). */
+/** Fase 5 -- catálogo completo (Paso 2) + mejora editorial (Paso siguiente):
+ * primer producto en tratamiento "featured" (panorámico, 2 columnas) para
+ * romper el grid parejo de ecommerce tradicional, entrada con Reveal
+ * escalonado por índice. El filtro por categoría sigue siendo un link
+ * ?categoria=handle (sin JS de cliente para el filtrado en sí) -- la
+ * `key` en el contenedor de la grilla fuerza un remount al cambiar de
+ * categoría, así los Reveal (whileInView) se disparan de nuevo en vez de
+ * quedar "ya revelados" de la vista anterior. */
 export default async function TiendaPage({
   searchParams,
 }: {
@@ -40,39 +45,51 @@ export default async function TiendaPage({
   return (
     <main className="px-6 pb-24 pt-40 md:pb-32">
       <div className="mx-auto max-w-2xl text-center">
-        <span aria-hidden="true" className="mx-auto block h-0.5 w-8 bg-amber-600" />
-        <h1 className="mt-6 text-h1 font-semibold text-neutral-900">El sistema, completo.</h1>
-        <p className="mt-4 text-body-lg text-neutral-700">
-          {activeTitle ?? "Todo el catálogo de BIMO Shop — elegido para convivir entre sí, no para llenar una vitrina."}
-        </p>
+        <Reveal>
+          <span aria-hidden="true" className="mx-auto block h-0.5 w-8 bg-amber-600" />
+        </Reveal>
+        <Reveal delay={0.08}>
+          <h1 className="mt-6 text-h1 font-semibold text-neutral-900">
+            {activeTitle ?? "El sistema, completo."}
+          </h1>
+        </Reveal>
+        <Reveal delay={0.16}>
+          <p className="mt-4 text-body-lg text-neutral-700">
+            {activeTitle
+              ? `Cada pieza de ${activeTitle.toLowerCase()}, elegida con el mismo criterio que el resto del sistema.`
+              : "Todo el catálogo de BIMO Shop — elegido para convivir entre sí, no para llenar una vitrina."}
+          </p>
+        </Reveal>
       </div>
 
       {!unavailable && collections.length > 0 && (
-        <nav aria-label="Categorías" className="mx-auto mt-10 flex max-w-4xl flex-wrap justify-center gap-2">
-          <Link
-            href="/tienda"
-            className={`rounded-full border px-4 py-1.5 text-small transition-colors ${
-              !categoria
-                ? "border-amber-700 bg-amber-700 text-white"
-                : "border-neutral-200 text-neutral-700 hover:border-amber-600"
-            }`}
-          >
-            Todos
-          </Link>
-          {collections.map((c) => (
+        <Reveal delay={0.24}>
+          <nav aria-label="Categorías" className="mx-auto mt-10 flex max-w-4xl flex-wrap justify-center gap-2">
             <Link
-              key={c.handle}
-              href={`/tienda?categoria=${c.handle}`}
-              className={`rounded-full border px-4 py-1.5 text-small transition-colors ${
-                categoria === c.handle
+              href="/tienda"
+              className={`rounded-full border px-4 py-1.5 text-small transition-all duration-200 ${
+                !categoria
                   ? "border-amber-700 bg-amber-700 text-white"
-                  : "border-neutral-200 text-neutral-700 hover:border-amber-600"
+                  : "border-neutral-200 text-neutral-700 hover:border-amber-600 hover:text-neutral-900"
               }`}
             >
-              {c.title}
+              Todos
             </Link>
-          ))}
-        </nav>
+            {collections.map((c) => (
+              <Link
+                key={c.handle}
+                href={`/tienda?categoria=${c.handle}`}
+                className={`rounded-full border px-4 py-1.5 text-small transition-all duration-200 ${
+                  categoria === c.handle
+                    ? "border-amber-700 bg-amber-700 text-white"
+                    : "border-neutral-200 text-neutral-700 hover:border-amber-600 hover:text-neutral-900"
+                }`}
+              >
+                {c.title}
+              </Link>
+            ))}
+          </nav>
+        </Reveal>
       )}
 
       {unavailable ? (
@@ -82,9 +99,13 @@ export default async function TiendaPage({
           {categoria ? "Todavía no hay productos en esta categoría." : "Todavía estamos preparando la colección de lanzamiento."}
         </ProductMessage>
       ) : (
-        <div className="mx-auto mt-16 grid max-w-5xl gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+        <div key={categoria ?? "todos"} className="mx-auto mt-16 grid max-w-5xl gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
           {products.map((product, i) => (
-            <ProductTile key={product.id} product={product} index={i} showDescription />
+            <Reveal key={product.id} delay={Math.min(i * 0.05, 0.4)}>
+              <div className={i === 0 ? "sm:col-span-2" : undefined}>
+                <ProductTile product={product} index={i} showDescription featured={i === 0} />
+              </div>
+            </Reveal>
           ))}
         </div>
       )}
