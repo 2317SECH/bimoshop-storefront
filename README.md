@@ -4,12 +4,14 @@ Tienda de cara al cliente. Proyecto independiente de `dashboard/` (panel
 interno) y del backend Python (`core/`, `agents/`) -- stack, repo de
 despliegue y ciclo de vida separados a propósito.
 
-Estado: Fase 8.2 del roadmap. Home completa (7 secciones) + Navbar/Footer
-sitewide. La sección Colección de lanzamiento ya consume la Storefront API
-real (`lib/shopify/`), sin datos hardcodeados -- si falta el token, degrada
-a un mensaje controlado en vez de romperse (ver §"Sin token todavía" abajo).
-Ver Brand Book y Design System de BIMO Shop para las decisiones que
-gobiernan todo lo que se construye acá.
+Estado: Fase 4 cerrada (2026-07-18). Home (7 secciones) + Navbar/Footer +
+`/tienda` + `/producto/[handle]` + carrito (cartCreate) + redirect a
+checkout nativo de Shopify, todo consumiendo la Storefront API real
+(`lib/shopify/`), sin datos hardcodeados. Desplegado en producción:
+https://bimoshop-storefront.vercel.app -- repo propio (`bimoshop-storefront`
+en GitHub), auto-deploy en cada push a `main`. Ver Brand Book y Design
+System de BIMO Shop para las decisiones que gobiernan todo lo que se
+construye acá.
 
 ## Stack
 
@@ -40,16 +42,13 @@ npm run dev
 
 ## Pasos manuales pendientes (no automatizables desde acá)
 
-1. **Token de Storefront API** -- generarlo en Shopify Admin (instrucciones
-   dentro de `.env.example`). Es una credencial de solo lectura de
-   catálogo/carrito, distinta de las credenciales de Admin API que ya usa
-   `store_builder` en el backend.
-2. **Dominio propio** (ej. bimoshop.com) -- comprar en cualquier
-   registrador y apuntarlo al proyecto de Vercel una vez desplegado.
-3. **Proyecto en Vercel** -- conectar este directorio (`storefront/`) como
-   Root Directory del proyecto Vercel, cargar las mismas variables de
-   `.env.example` en la configuración de entorno de Vercel.
+1. ~~Token de Storefront API~~ -- hecho, generado y verificado en vivo.
+2. ~~Proyecto en Vercel~~ -- hecho, desplegado y verificado en vivo.
+3. **Dominio propio** -- ya comprado por Sergio, falta conectarlo a este
+   proyecto de Vercel y a Shopify.
+4. **Configuración comercial en Shopify** (pagos, envíos, impuestos) --
+   pendiente en Shopify Admin, no depende de este repo.
 
-Ninguno de estos tres pasos requiere cambios de código -- son
+Ninguno de estos pasos requiere cambios de código acá -- son
 configuración externa que solo se puede hacer con acceso real a las
 cuentas de Shopify/Vercel/registrador de dominio.
