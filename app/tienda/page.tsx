@@ -60,6 +60,11 @@ export default async function TiendaPage({
               : "Todo el catálogo de BIMO Shop — elegido para convivir entre sí, no para llenar una vitrina."}
           </p>
         </Reveal>
+        <Reveal delay={0.2}>
+          <p className="mt-3 font-mono text-caption uppercase tracking-wide text-amber-700">
+            Catálogo en rotación — nuevas piezas cada 1 a 2 semanas
+          </p>
+        </Reveal>
       </div>
 
       {!unavailable && collections.length > 0 && (
