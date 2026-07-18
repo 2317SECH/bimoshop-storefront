@@ -3,9 +3,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ImageOff } from "lucide-react";
-import { getProductByHandle } from "@/lib/shopify/products";
+import { getProductByHandle, getRelatedProducts } from "@/lib/shopify/products";
 import { formatMoney } from "@/lib/format";
 import { BuyButton } from "@/components/product/BuyButton";
+import { ProductTile } from "@/components/product/ProductTile";
 
 /** Fase 4 -- pagina de producto individual. Antes de esto, cada tile de
  * producto (Home/tienda) apuntaba a `/producto/[handle]` y daba 404 --
@@ -34,6 +35,7 @@ export default async function ProductPage({ params }: { params: Promise<{ handle
   }
 
   const [mainImage, ...restImages] = product.images;
+  const related = await getRelatedProducts(product.collectionHandle, product.handle);
 
   return (
     <main className="px-6 pb-24 pt-32 md:pb-32 md:pt-40">
@@ -89,6 +91,17 @@ export default async function ProductPage({ params }: { params: Promise<{ handle
             <BuyButton variantId={product.variantId} availableForSale={product.availableForSale} />
           </div>
         </div>
+
+        {related.length > 0 && (
+          <div className="mt-24">
+            <h2 className="text-h4 font-semibold text-neutral-900">También te puede interesar</h2>
+            <div className="mt-8 grid grid-cols-2 gap-x-8 gap-y-10 lg:grid-cols-4">
+              {related.map((item, i) => (
+                <ProductTile key={item.id} product={item} index={i} />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </main>
   );

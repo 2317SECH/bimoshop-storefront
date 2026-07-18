@@ -2,34 +2,56 @@
  * (transporte) y de products.ts (transformación) para que cada una se
  * pueda revisar/versionar por separado. */
 
-export const LAUNCH_PRODUCTS_QUERY = /* GraphQL */ `
-  query LaunchProducts($first: Int!) {
-    products(first: $first, sortKey: CREATED_AT) {
-      nodes {
-        id
-        title
-        handle
-        description
-        priceRange {
-          minVariantPrice {
-            amount
-            currencyCode
+/** Catálogo completo real -- "El Sistema BIMO" es la colección maestra a la
+ * que `store_builder` agrega todo producto aprobado (49/49 confirmado en
+ * vivo, Fase 5 Paso 2). Consultar por colección en vez de `products()` sin
+ * filtro es a propósito: la tienda tiene productos de descarte/pruebas
+ * (ACTIVE pero nunca publicados a ningún canal ni colección) que NO deben
+ * poder colarse acá -- ver STATUS_BIMOSHOP.md. */
+export const PRODUCTS_BY_COLLECTION_QUERY = /* GraphQL */ `
+  query ProductsByCollection($handle: String!, $first: Int!) {
+    collection(handle: $handle) {
+      products(first: $first, sortKey: CREATED, reverse: true) {
+        nodes {
+          id
+          title
+          handle
+          description
+          priceRange {
+            minVariantPrice {
+              amount
+              currencyCode
+            }
           }
-        }
-        featuredImage {
-          url
-          altText
-          width
-          height
+          featuredImage {
+            url
+            altText
+            width
+            height
+          }
         }
       }
     }
   }
 `;
 
+/** Categorías reales para el filtro de `/tienda` -- ya existen en Shopify
+ * (armadas por store_builder al publicar), no se inventa ninguna acá. */
+export const COLLECTIONS_QUERY = /* GraphQL */ `
+  query StoreCollections {
+    collections(first: 30) {
+      nodes {
+        handle
+        title
+      }
+    }
+  }
+`;
+
 /** Producto individual por handle -- `/producto/[handle]` (Fase 4). Trae
- * galeria completa (no solo featuredImage) y el id de la primera variante
- * disponible, que es lo que necesita cartCreate para el botón de compra. */
+ * galeria completa (no solo featuredImage), el id de la primera variante
+ * disponible (lo que necesita cartCreate) y sus colecciones (para armar
+ * "productos relacionados" -- Fase 5 Paso 2). */
 export const PRODUCT_BY_HANDLE_QUERY = /* GraphQL */ `
   query ProductByHandle($handle: String!) {
     product(handle: $handle) {
@@ -55,6 +77,11 @@ export const PRODUCT_BY_HANDLE_QUERY = /* GraphQL */ `
         nodes {
           id
           availableForSale
+        }
+      }
+      collections(first: 5) {
+        nodes {
+          handle
         }
       }
     }

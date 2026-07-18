@@ -1,32 +1,41 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { ProductTile } from "@/components/product/ProductTile";
 import { ProductMessage } from "@/components/product/ProductMessage";
-import { getLaunchProducts } from "@/lib/shopify/products";
-import type { LaunchProduct } from "@/lib/shopify/types";
+import { getCatalog, getCollections, getProductsByCollection } from "@/lib/shopify/products";
+import type { LaunchProduct, StoreCollection } from "@/lib/shopify/types";
 
 export const metadata: Metadata = {
   title: "Tienda — BIMO Shop",
-  description: "Los primeros cinco productos de BIMO Shop, elegidos para convivir entre sí.",
+  description: "El catálogo completo de BIMO Shop.",
 };
 
-/** Fase 8.4 -- catálogo. Misma capa de datos que la Colección del Home
- * (lib/shopify/products.ts, sin consulta nueva) y misma ProductTile --
- * solo cambia el layout (grid de página completa en vez de fila-sistema)
- * y el copy, porque el contexto es distinto. Grid 3/2/1 columnas (Design
- * System §4): con exactamente 5 productos nunca queda una fila huérfana
- * (3 + 2), a propósito no se pagina ni se filtra -- no hay volumen que lo
- * justifique todavía y agregarlo se sentiría más "e-commerce genérico",
- * justo lo que se pidió evitar. */
-export default async function TiendaPage() {
+/** Fase 5 Paso 2 -- catálogo completo, con filtro por categoría real de
+ * Shopify (chips por query param, sin JS de cliente: cada chip es un link
+ * `?categoria=handle`, el filtrado corre server-side). Reemplaza la Fase
+ * 8.4 (5 productos fijos, sin filtro). */
+export default async function TiendaPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ categoria?: string }>;
+}) {
+  const { categoria } = await searchParams;
+
   let products: LaunchProduct[] = [];
+  let collections: StoreCollection[] = [];
   let unavailable = false;
 
   try {
-    products = await getLaunchProducts(5);
+    [products, collections] = await Promise.all([
+      categoria ? getProductsByCollection(categoria, 100) : getCatalog(100),
+      getCollections(),
+    ]);
   } catch (err) {
-    console.error("shopify.getLaunchProducts failed (tienda):", err);
+    console.error("shopify catalog fetch failed (tienda):", err);
     unavailable = true;
   }
+
+  const activeTitle = collections.find((c) => c.handle === categoria)?.title;
 
   return (
     <main className="px-6 pb-24 pt-40 md:pb-32">
@@ -34,15 +43,44 @@ export default async function TiendaPage() {
         <span aria-hidden="true" className="mx-auto block h-0.5 w-8 bg-amber-600" />
         <h1 className="mt-6 text-h1 font-semibold text-neutral-900">El sistema, completo.</h1>
         <p className="mt-4 text-body-lg text-neutral-700">
-          Los primeros cinco productos de BIMO Shop — elegidos para convivir entre sí, no para llenar un
-          catálogo.
+          {activeTitle ?? "Todo el catálogo de BIMO Shop — elegido para convivir entre sí, no para llenar una vitrina."}
         </p>
       </div>
+
+      {!unavailable && collections.length > 0 && (
+        <nav aria-label="Categorías" className="mx-auto mt-10 flex max-w-4xl flex-wrap justify-center gap-2">
+          <Link
+            href="/tienda"
+            className={`rounded-full border px-4 py-1.5 text-small transition-colors ${
+              !categoria
+                ? "border-amber-700 bg-amber-700 text-white"
+                : "border-neutral-200 text-neutral-700 hover:border-amber-600"
+            }`}
+          >
+            Todos
+          </Link>
+          {collections.map((c) => (
+            <Link
+              key={c.handle}
+              href={`/tienda?categoria=${c.handle}`}
+              className={`rounded-full border px-4 py-1.5 text-small transition-colors ${
+                categoria === c.handle
+                  ? "border-amber-700 bg-amber-700 text-white"
+                  : "border-neutral-200 text-neutral-700 hover:border-amber-600"
+              }`}
+            >
+              {c.title}
+            </Link>
+          ))}
+        </nav>
+      )}
 
       {unavailable ? (
         <ProductMessage>No pudimos cargar el catálogo en este momento. Volvé a intentarlo en unos minutos.</ProductMessage>
       ) : products.length === 0 ? (
-        <ProductMessage>Todavía estamos preparando la colección de lanzamiento.</ProductMessage>
+        <ProductMessage>
+          {categoria ? "Todavía no hay productos en esta categoría." : "Todavía estamos preparando la colección de lanzamiento."}
+        </ProductMessage>
       ) : (
         <div className="mx-auto mt-16 grid max-w-5xl gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
           {products.map((product, i) => (
