@@ -27,7 +27,11 @@ export async function shopifyStorefront<T>(query: string, variables?: Record<str
       "X-Shopify-Storefront-Access-Token": token,
     },
     body: JSON.stringify({ query, variables }),
-    next: { revalidate: 60 },
+    // Sin cache: el catálogo rota cada 1-2 semanas y las ediciones en
+    // Shopify tienen que verse de inmediato, no atadas a un redeploy ni a
+    // un timer de ISR que en producción quedó sirviendo /tienda con datos
+    // de más de una semana (ver auditoría BimoShop 27 jul 2026).
+    cache: "no-store",
   });
 
   if (!res.ok) {
