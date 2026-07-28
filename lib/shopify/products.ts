@@ -56,11 +56,16 @@ export async function getCatalog(count = 100): Promise<LaunchProduct[]> {
   return getProductsByCollection(MASTER_COLLECTION_HANDLE, count);
 }
 
-/** Categorías reales para el filtro de `/tienda` -- excluye la maestra y la
- * default de Shopify, ninguna se inventa. */
+/** Categorías reales para el filtro de `/tienda` -- excluye la maestra, la
+ * default de Shopify, y cualquier categoría sin productos activos (la
+ * Storefront API solo devuelve productos ACTIVE/publicados, así que una
+ * colección con todo en borrador --p.ej. tras una depuración-- llega acá
+ * con `products.nodes` vacío). Ninguna categoría se inventa. */
 export async function getCollections(): Promise<StoreCollection[]> {
   const data = await shopifyStorefront<CollectionsResponse>(COLLECTIONS_QUERY, {});
-  return data.collections.nodes.filter((c) => !HIDDEN_COLLECTION_HANDLES.has(c.handle));
+  return data.collections.nodes
+    .filter((c) => !HIDDEN_COLLECTION_HANDLES.has(c.handle) && c.products.nodes.length > 0)
+    .map((c) => ({ handle: c.handle, title: c.title }));
 }
 
 /** Producto individual por handle -- `/producto/[handle]` (Fase 4). null si

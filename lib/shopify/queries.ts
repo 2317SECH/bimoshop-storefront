@@ -43,6 +43,11 @@ export const COLLECTIONS_QUERY = /* GraphQL */ `
       nodes {
         handle
         title
+        products(first: 1) {
+          nodes {
+            id
+          }
+        }
       }
     }
   }

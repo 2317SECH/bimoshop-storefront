@@ -32,8 +32,12 @@ export type StoreCollection = {
   title: string;
 };
 
+type RawCollectionNode = StoreCollection & {
+  products: { nodes: { id: string }[] };
+};
+
 export type CollectionsResponse = {
-  collections: { nodes: StoreCollection[] };
+  collections: { nodes: RawCollectionNode[] };
 };
 
 /** Forma que consume la UI -- desacoplada del shape crudo de la respuesta
