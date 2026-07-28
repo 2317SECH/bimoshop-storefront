@@ -1,17 +1,14 @@
 import Link from "next/link";
 import { NAV_LINKS } from "@/lib/site-nav";
 
-/** Vacío a propósito -- sin cuentas reales todavía (Design System §5.6:
- * "sin íconos de redes sociales si no hay cuentas activas y mantenidas").
- * Activar agregando entradas acá; el render de abajo ya está listo para
- * iterarlo sin más cambios. */
-const SOCIAL_LINKS: { label: string; href: string }[] = [];
+const SOCIAL_LINKS: { label: string; href: string }[] = [
+  { label: "WhatsApp", href: "https://wa.me/573136682674" },
+];
 
 /** Footer -- sitewide (vive en app/layout.tsx, no en cada página). La
  * columna de Políticas se sacó (Fase 5, corrección de dirección): son
  * compromisos legales reales (envíos/devoluciones/privacidad/términos),
- * no se inventa el texto -- vuelve cuando Sergio defina el contenido real.
- * Ningún dato de contacto/redes se inventa mientras no exista de verdad. */
+ * no se inventa el texto -- vuelve cuando Sergio defina el contenido real. */
 export function Footer() {
   const year = new Date().getFullYear();
 
@@ -38,21 +35,20 @@ export function Footer() {
 
         <div className="flex flex-col gap-3">
           <span className="text-caption font-medium uppercase tracking-wide text-neutral-400">Contacto</span>
-          <p className="text-small">
-            Todavía no tenemos canales de contacto ni redes activas. Vas a poder escribirnos apenas estén
-            disponibles.
-          </p>
-          {SOCIAL_LINKS.length > 0 && (
-            <ul className="flex gap-4">
-              {SOCIAL_LINKS.map((item) => (
-                <li key={item.href}>
-                  <a href={item.href} className="text-small text-neutral-0 hover:opacity-70">
-                    {item.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          )}
+          <ul className="flex gap-4">
+            {SOCIAL_LINKS.map((item) => (
+              <li key={item.href}>
+                <a
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-small text-neutral-0 hover:opacity-70"
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
 

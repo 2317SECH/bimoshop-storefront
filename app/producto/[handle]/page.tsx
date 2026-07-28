@@ -6,6 +6,7 @@ import { ImageOff } from "lucide-react";
 import { getProductByHandle, getRelatedProducts } from "@/lib/shopify/products";
 import { formatMoney } from "@/lib/format";
 import { BuyButton } from "@/components/product/BuyButton";
+import { WhatsAppButton } from "@/components/product/WhatsAppButton";
 import { ProductTile } from "@/components/product/ProductTile";
 import { Reveal } from "@/components/motion/Reveal";
 
@@ -115,7 +116,10 @@ export default async function ProductPage({ params }: { params: Promise<{ handle
 
               {product.description && <p className="text-body text-neutral-700">{product.description}</p>}
 
-              <BuyButton variantId={product.variantId} availableForSale={product.availableForSale} />
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <BuyButton variantId={product.variantId} availableForSale={product.availableForSale} />
+                <WhatsAppButton productTitle={product.title} />
+              </div>
             </div>
           </Reveal>
         </div>
